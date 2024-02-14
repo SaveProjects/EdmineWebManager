@@ -21,12 +21,10 @@
         </div>
         @endif
         <div>
-            <label for="pseudo">Pseudo:</label>
-            <input type="text" id="pseudo" name="pseudo" value="{{ old('pseudo') }}" required>
+            <input type="text" id="pseudo" placeholder="Pseudo" name="pseudo" value="{{ old('pseudo') }}" required>
         </div>
         <div>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
+            <input type="password" id="password" placeholder="Mot de passe" name="password" required>
         </div>
         <button type="submit">Login</button>
     </form>
