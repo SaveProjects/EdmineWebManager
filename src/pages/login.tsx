@@ -17,7 +17,7 @@ import styles from '../styles/login.module.scss';
 const Login = (props: PaperProps) => {
 
   const { data: session } = useSession();
-  console.log(session);
+  // console.log(session);
 
   const form = useForm({
     initialValues: {
@@ -44,7 +44,14 @@ const Login = (props: PaperProps) => {
   return (
       <div className={styles.container}>
         {session?.user ? (
-            <p>Already logged in</p>
+            <div className={styles.logout}>
+              <p>Vous êtes déjà connecter !</p>
+              <div>
+                <Button type="submit" className={styles.btnblue} radius="xl" onClick={()=>{signOut()}}>
+                  Se deconnecter
+                </Button>
+              </div>
+            </div>
         ) : (
             <Paper radius="md" p="xl" withBorder {...props}>
               <h1>Connexion au manager</h1>
@@ -76,12 +83,6 @@ const Login = (props: PaperProps) => {
                     />
                   </div>
                   <div className={styles.containerButton}>
-                    <label className={styles.labelCheckBox}>
-                      <input
-                          type="checkbox"
-                      />{" "}
-                      Se souvenir de moi
-                    </label>
                     <Button type="submit" radius="xl" className={styles.btnblue}>
                       {upperFirst("Connexion")}
                     </Button>

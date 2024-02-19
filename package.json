@@ -13,6 +13,7 @@
     "@mantine/form": "^7.5.2",
     "crypto": "^1.0.1",
     "i": "^0.3.7",
+    "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.9.1",
     "next": "14.1.0",
     "next-auth": "^4.24.6",

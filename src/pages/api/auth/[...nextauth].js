@@ -4,6 +4,7 @@ import sequelize from "../../../module/sequelize";
 import {createHash} from 'crypto'
 
 export const authOptions = {
+  debug:true,
   // Configure one or more authentication providers
   providers: [
     CredentialsProvider({
@@ -16,30 +17,24 @@ export const authOptions = {
         
         const userQuery = await sequelize.query(`SELECT * FROM ed_login WHERE player_name LIKE '${credentials.name}%';`)
         const user = userQuery[0][0]
-        
-        
-        const hash = createHash('sha256').update(credentials.password).digest('hex');
-        console.log('||||||||||')
-        console.log(hash)
-        console.log(credentials.password)
-        console.log(user)
-        console.log(user?.player_password)
-        console.log(userQuery[0].length)
-        console.log('||||||||||')
 
-        return null
+        // if(userQuery[0].length>1) return null
 
-        if(userQuery[0].length>1) return null
+        if(user){
 
-        if(userData&&userData.player_uuid){
+          const hash = createHash('sha256').update(credentials.password).digest('hex');
 
-          return null
+          if(hash==user?.player_password){
+            
+            return {
+              name: user?.player_name,
+              id:user?.player_uuid
+            };
+
+          }else{
+            return null
+          }
   
-          // return {
-          //   name: user.firstname,
-          //   id:user.id,
-          //   email: user.email,
-          // };
 
         }else{
           return null;
@@ -64,28 +59,40 @@ export const authOptions = {
     async session({ session, token, user }) {
 
       // PUT ID
-      // const uerss = await User.findOne({where:{email:session.user.email}})
+      try {
+        const [userResults, userMetadata] = await sequelize.query(`SELECT * FROM ed_login WHERE player_name LIKE '${token.name}%';`)
+        const users = userResults[0]
+        const uuid = users[`player_uuid`]
+        const [rankResults, rankMetadata] = await sequelize.query(`SELECT * FROM ed_ranks WHERE player_uuid LIKE '${uuid}%';`)
+        const rankUser = rankResults[0]
+        const rank = rankUser?.player_modulable_rank
 
-      // if(uerss){
+        if(uuid){
 
-      //   session.user.id=uerss.dataValues.id
+          session.user.id=uuid
+          session.user.modulable_rank = rank|0
 
-      // }else{
+        }else{
 
-      //   session.user.id="bizzard"
+          session.user.id="bizzard"
 
-      // }
-      // // Send properties to the client, like an access_token from a porvider.
+        }
+      } catch (error) {
+        console.log(error)
+      }
+      // Send properties to the client, like an access_token from a porvider.
       // session.accessToken = token.accessToken
-      // // session.user.id = user.id
-      // return session
+      // session.user.id = user.id
+      return session
     }
   },
   jwt: {
     strategy: "database",
     maxAge: 30 * 24 * 60 * 60, // 30 days
     updateAge: 24 * 60 * 60, // 24 hours
-  }
+    // WARNING (define secret)
+    secret: `Xx1RXditvzNgtF/dUNIWMRa8i6Nlc/1Sl2mCq5HxmcE=`,
+  },
 }
 
 export default NextAuth(authOptions)
